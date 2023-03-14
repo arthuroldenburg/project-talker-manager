@@ -1,11 +1,13 @@
 const express = require('express');
-const { getAllTalkers, getTalkerById, generateToken } = require('./talker');
+const { getAllTalkers, getTalkerById, generateToken, validateEmail } = require('./talker');
 
 const app = express();
 app.use(express.json());
+const SIX = 6;
 
 const HTTP_OK_STATUS = 200;
 const HTTP_NOT_FOUND = 404;
+const HTTP_BAD_REQUEST = 400;
 const PORT = process.env.PORT || '3001';
 
 // não remova esse endpoint, e para o avaliador funcionar
@@ -37,9 +39,21 @@ app.get('/talker/:id', async (req, res) => {
 
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
-  return (email && password) ? (
-    res.status(HTTP_OK_STATUS).json({ token: generateToken() })
-  ) : (
-    res.status(HTTP_NOT_FOUND).json()
-  );
+  const validEmail = validateEmail(email);
+  if (!email) {
+    return res.status(HTTP_BAD_REQUEST).json({ message: 'O campo "email" é obrigatório' }); 
+}
+  if (!validEmail) {
+    return res.status(HTTP_BAD_REQUEST).json({
+      message: 'O "email" deve ter o formato "email@email.com"' });
+  }
+  if (!password) {
+    return res.status(HTTP_BAD_REQUEST).json({ message: 'O campo "password" é obrigatório' }); 
+}
+  if (password.length < SIX) {
+    return res.status(HTTP_BAD_REQUEST).json({
+      message: 'O "password" deve ter pelo menos 6 caracteres',
+    });
+  }
+  return res.status(HTTP_OK_STATUS).json({ token: generateToken() });
 });
