@@ -17,7 +17,18 @@ const getTalkerById = async (talkerId) => {
   return readFile.find(({ id }) => id === talkerId);
 };
 
+const generateToken = () => {
+  const length = 16;
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let token = '';
+  for (let i = 0; i < length; i += 1) {
+    token += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return token;
+};
+
 module.exports = {
   getAllTalkers,
   getTalkerById,
+  generateToken,
 };
