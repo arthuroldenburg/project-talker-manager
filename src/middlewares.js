@@ -1,8 +1,8 @@
-const { validateEmail, validateDate } = require('./talker');
+const { validateEmail, validateDate, getTalkerById } = require('./talker');
 
 const HTTP_UNAUTHORIZED = 401;
 // const HTTP_CREATED = 201;
-// const HTTP_NOT_FOUND = 404;
+const HTTP_NOT_FOUND = 404;
 const HTTP_BAD_REQUEST = 400;
 const SIX = 6;
 
@@ -120,6 +120,28 @@ const validateRateNum = (req, res, next) => {
   next();
 };
 
+const validateRate = (req, res, next) => {
+  const { talk } = req.body;
+  const { rate } = talk;
+  if (!rate) {
+    return res.status(HTTP_BAD_REQUEST).json({
+      message: 'O campo "rate" é obrigatório',
+    });
+  }
+  next();
+};
+
+const attTalker = async (req, res, next) => {
+  const { id } = req.params;
+  const getTalkerId = await getTalkerById(Number(id));
+  if (!getTalkerId) {
+    return res.status(HTTP_NOT_FOUND).json({
+      message: 'Pessoa palestrante não encontrada',
+    });
+  }
+  next();
+};
+
 module.exports = {
   emailValidation,
   passwordValidation,
@@ -130,4 +152,6 @@ module.exports = {
   validateWatchedAt,
   validateRateUndefined,
   validateRateNum,
+  validateRate,
+  attTalker,
 };

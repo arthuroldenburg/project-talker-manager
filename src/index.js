@@ -1,8 +1,10 @@
 const express = require('express');
 const { authToken, emailValidation, passwordValidation, validateName,
   validateAge, validateTalk, validateWatchedAt, validateRateUndefined,
-  validateRateNum } = require('./middlewares');
-const { getAllTalkers, getTalkerById, generateToken, createTalker } = require('./talker');
+  validateRateNum, 
+  attTalker } = require('./middlewares');
+const { getAllTalkers, getTalkerById, generateToken, createTalker,
+  deleteTalker } = require('./talker');
 
 const app = express();
 app.use(express.json());
@@ -10,6 +12,7 @@ app.use(express.json());
 const HTTP_OK_STATUS = 200;
 const HTTP_CREATED = 201;
 const HTTP_NOT_FOUND = 404;
+const HTTP_NO_CONTENT = 204;
 const PORT = process.env.PORT || '3001';
 
 // não remova esse endpoint, e para o avaliador funcionar
@@ -51,4 +54,16 @@ async (req, res) => {
   const { name, age, talk } = req.body;
   const newTalker = await createTalker(name, age, talk);
   return res.status(HTTP_CREATED).json(newTalker);
+});
+
+app.put('/talker/:id', authToken, validateName, validateAge, validateTalk,
+validateWatchedAt, validateRateUndefined, validateRateNum, attTalker, (req, res) => {
+  // console.log('xablau');
+   res.status(HTTP_OK_STATUS).json({ message: 'ok' });
+});
+
+app.delete('/talker/:id', async (req, res) => {
+  const { id } = req.params;
+  await deleteTalker(Number(id));
+  res.status(HTTP_NO_CONTENT).end();
 });

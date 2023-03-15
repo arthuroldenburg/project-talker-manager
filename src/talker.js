@@ -20,6 +20,18 @@ const createTalker = async (name, age, talk) => {
   return newTalker;
 };
 
+const deleteTalker = async (id) => {
+  const data = await readTalkerFile();
+  console.log(Object.keys(data[0]));
+  const talkerExist = data.find((talker) => talker.id === id);
+  if (talkerExist) {
+    const newFile = data.filter((talker) => talker.id !== id);
+    await writeTalkerFile(newFile);
+    return true;
+  }
+  return false;
+};
+
 const getAllTalkers = async () => {
   const readFile = await readTalkerFile();
   return readFile;
@@ -49,13 +61,14 @@ const validateDate = (date) => {
   const regex = /(\d{2})[/](\d{2})[/](\d{4})/.exec(date);
   if (regex === null) {
     return false;
-}
-const day = regex[1];
-const month = regex[2];
-const year = regex[3];
-const data = new Date(year, month, day);
-return data.getDate() === Number(day)
-&& data.getMonth() === Number(month) && data.getFullYear() === Number(year);
+  }
+
+  const day = regex[1];
+  const month = regex[2];
+  const year = regex[3];
+  const data = new Date(year, month, day);
+  return data.getDate() === Number(day)
+  && data.getMonth() === Number(month) && data.getFullYear() === Number(year);
 };
 
 module.exports = {
@@ -65,4 +78,5 @@ module.exports = {
   validateEmail,
   validateDate,
   createTalker,
+  deleteTalker,
 };
