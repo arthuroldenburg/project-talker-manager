@@ -1,13 +1,15 @@
 const express = require('express');
-const { getAllTalkers, getTalkerById, generateToken, validateEmail } = require('./talker');
+const { authToken, emailValidation, passwordValidation, validateName,
+  validateAge, validateTalk, validateWatchedAt, validateRateUndefined,
+  validateRateNum } = require('./middlewares');
+const { getAllTalkers, getTalkerById, generateToken, createTalker } = require('./talker');
 
 const app = express();
 app.use(express.json());
-const SIX = 6;
 
 const HTTP_OK_STATUS = 200;
+const HTTP_CREATED = 201;
 const HTTP_NOT_FOUND = 404;
-const HTTP_BAD_REQUEST = 400;
 const PORT = process.env.PORT || '3001';
 
 // não remova esse endpoint, e para o avaliador funcionar
@@ -37,23 +39,16 @@ app.get('/talker/:id', async (req, res) => {
   );
 });
 
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  const validEmail = validateEmail(email);
-  if (!email) {
-    return res.status(HTTP_BAD_REQUEST).json({ message: 'O campo "email" é obrigatório' }); 
-}
-  if (!validEmail) {
-    return res.status(HTTP_BAD_REQUEST).json({
-      message: 'O "email" deve ter o formato "email@email.com"' });
-  }
-  if (!password) {
-    return res.status(HTTP_BAD_REQUEST).json({ message: 'O campo "password" é obrigatório' }); 
-}
-  if (password.length < SIX) {
-    return res.status(HTTP_BAD_REQUEST).json({
-      message: 'O "password" deve ter pelo menos 6 caracteres',
-    });
-  }
-  return res.status(HTTP_OK_STATUS).json({ token: generateToken() });
+app.post('/login', emailValidation, passwordValidation, (req, res) => {
+  const token = generateToken();
+  res.setHeader('Authorization', token);
+  return res.status(HTTP_OK_STATUS).json({ token });
+});
+
+app.post('/talker', authToken, validateName, validateAge,
+validateTalk, validateWatchedAt, validateRateUndefined, validateRateNum,
+async (req, res) => {
+  const { name, age, talk } = req.body;
+  const newTalker = await createTalker(name, age, talk);
+  return res.status(HTTP_CREATED).json(newTalker);
 });
