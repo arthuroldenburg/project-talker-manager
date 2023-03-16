@@ -9,21 +9,31 @@ const readTalkerFile = async () => {
 
 const writeTalkerFile = async (talker) => {
   const path = './talker.json';
-  await fs.writeFile(join(__dirname, path), JSON.stringify(talker, null, 2));
+  await fs.writeFile(join(__dirname, path), JSON.stringify(talker));
 };
 
 const createTalker = async (name, age, talk) => {
   const file = await readTalkerFile();
-  const newTalker = { id: file.length += 1, name, age, talk };
+  const newTalker = { id: file.length + 1, name, age, talk };
   file.push(newTalker);
   await writeTalkerFile(file);
   return newTalker;
 };
 
+const updateTalker = async (id, newTalker) => {
+  const file = await readTalkerFile();
+  const findTalker = file.find((talker) => talker.id === id);
+  findTalker.name = newTalker.name;
+  findTalker.age = newTalker.age;
+  findTalker.talk = newTalker.talk;
+  file[id - 1] = findTalker;
+  await writeTalkerFile(file);
+  return findTalker;
+};
+
 const deleteTalker = async (id) => {
   const data = await readTalkerFile();
-  console.log(Object.keys(data[0]));
-  const talkerExist = data.find((talker) => talker.id === id);
+  const talkerExist = data.some((talker) => talker.id === id);
   if (talkerExist) {
     const newFile = data.filter((talker) => talker.id !== id);
     await writeTalkerFile(newFile);
@@ -78,5 +88,6 @@ module.exports = {
   validateEmail,
   validateDate,
   createTalker,
+  updateTalker,
   deleteTalker,
 };

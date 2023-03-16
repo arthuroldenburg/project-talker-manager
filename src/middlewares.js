@@ -75,7 +75,7 @@ const validateAge = (req, res, next) => {
 const validateTalk = (req, res, next) => {
   const { talk } = req.body;
   if (!talk) {
-    res.status(HTTP_BAD_REQUEST).json({
+    return res.status(HTTP_BAD_REQUEST).json({
       message: 'O campo "talk" é obrigatório' });
   }
   next();
@@ -83,13 +83,13 @@ const validateTalk = (req, res, next) => {
 
 const validateWatchedAt = (req, res, next) => {
   const { talk } = req.body;
-  const { watchedAt } = talk;
-  if (!watchedAt) {
+  // const { watchedAt } = talk;
+  if (!talk.watchedAt) {
     return res.status(HTTP_BAD_REQUEST).json({
       message: 'O campo "watchedAt" é obrigatório',
     });
   }
-  if (!validateDate(watchedAt)) {
+  if (!validateDate(talk.watchedAt)) {
     return res.status(HTTP_BAD_REQUEST).json({
       message: 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"',
     });

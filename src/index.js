@@ -4,7 +4,8 @@ const { authToken, emailValidation, passwordValidation, validateName,
   validateRateNum, 
   attTalker } = require('./middlewares');
 const { getAllTalkers, getTalkerById, generateToken, createTalker,
-  deleteTalker } = require('./talker');
+  deleteTalker, 
+  updateTalker } = require('./talker');
 
 const app = express();
 app.use(express.json());
@@ -57,13 +58,15 @@ async (req, res) => {
 });
 
 app.put('/talker/:id', authToken, validateName, validateAge, validateTalk,
-validateWatchedAt, validateRateUndefined, validateRateNum, attTalker, (req, res) => {
-  // console.log('xablau');
-   res.status(HTTP_OK_STATUS).json({ message: 'ok' });
-});
+validateWatchedAt, validateRateUndefined, validateRateNum, attTalker, async (req, res) => {
+  const newTalker = req.body;
+  const { id } = req.params;
+  const talkerUpdated = await updateTalker(Number(id), newTalker);
+  return res.status(HTTP_OK_STATUS).json(talkerUpdated);
+  });
 
-app.delete('/talker/:id', async (req, res) => {
+app.delete('/talker/:id', authToken, async (req, res) => {
   const { id } = req.params;
   await deleteTalker(Number(id));
-  res.status(HTTP_NO_CONTENT).end();
+  return res.status(HTTP_NO_CONTENT).end();
 });
