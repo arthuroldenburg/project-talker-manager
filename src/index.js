@@ -70,3 +70,8 @@ app.delete('/talker/:id', authToken, async (req, res) => {
   await deleteTalker(Number(id));
   return res.status(HTTP_NO_CONTENT).end();
 });
+
+app.get('/talker/search', (req, res) => {
+  const xablau = req.query;
+  return res.status(HTTP_OK_STATUS).json({ message: xablau }); 
+});
